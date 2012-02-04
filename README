@@ -1,1 +1,8 @@
-TODO
+This Arduino Sketch controls a NIXIE clock with 4 tubes. 
+I used a plain ATMega168 microcontroller instead of an Arduino board for obvious reasons.
+Here is a picture of the circuit board: http://dl.dropbox.com/u/3873342/NIXIE/IMG_3210.jpg
+
+I am using a Philips PCF8583 Clock/Calendar chip to keep track of the time. 
+There is an Arduino Library by Erik DeBill <erik@debill.org> which can be found here: https://github.com/edebill/PCF8583
+
+Schematics will be made available as soon as I find some time.
