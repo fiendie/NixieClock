@@ -29,7 +29,12 @@
 
 #include <Wire.h>
 #include <stdio.h>
-#include <PCF8583.h>
+	 
+#define DS1307_ADDRESS 0x68
+
+#define SHOW_TIME	0
+#define SHOW_DATE	1
+#define SHOW_YEAR	2
 
 #define N_NIXIES	4
 
@@ -45,8 +50,22 @@
 #define BIT_C		A1
 #define BIT_D		A3
 
-#define SWITCH_UP	6
-#define SWITCH_DOWN	7
+#define SWITCH_UP	5
+#define SWITCH_DOWN	6
+
+#define BUTTON		8
+
+
+ // Holds the current time and date
+ struct {
+ 	int hour;
+ 	int minute;
+ 	int second;
+ 	int dayOfWeek;
+ 	int day;
+ 	int month;
+ 	int year;
+ } ds;
 
 static const uint8_t nixies[N_NIXIES]	= { NIXIE1, NIXIE2, NIXIE3, NIXIE4 };
 static const uint8_t bits[4]			= { BIT_A, BIT_B, BIT_C, BIT_D };
@@ -56,18 +75,80 @@ static const uint8_t nums[10][4] = {
 	{1, 0, 1, 0}, {0, 1, 1, 0},	{1, 1, 1, 0}, {0, 0, 0, 1},	{1, 0, 0, 1}
 };
 
+// The values that are currently being displayed
 static volatile uint8_t nixie_val[N_NIXIES] = { 0 };
+
+// The values that are actually to be displayed in the end 
+static uint8_t nixie_set[N_NIXIES] = {0};
+
 static volatile uint8_t time_passed = 1;
+
+// Position of the number in the tube
+static const uint8_t nixie_level[10+1] = {
+	10, 1, 2, 6, 7,	5, 0, 4, 9, 8, 3
+};
+
+static uint8_t animation_speed = 8;
+static volatile uint8_t animation_step = 0;
 
 static uint8_t switchup	= 0;
 static uint8_t switchdn	= 0;
+
+static uint8_t btn = 0;
+static uint8_t mode = 0;
 
 static uint8_t cur_sec = 0;
 static int cnt = 0;
 
 static uint8_t active_nixie = 0;
 
-PCF8583 p (0xA0);
+
+// Converts binary-coded decimal back to decimal
+byte bcdToDec(byte val) {
+	return ((val / 16 * 10) + (val % 16));
+}
+
+
+// Converts decimal values to binary-coded decimal
+byte decToBcd(byte val) {
+  return ((val / 10 * 16) + (val % 10));
+}
+
+
+void getTime() {
+	// Reset the register pointer
+	Wire.beginTransmission(DS1307_ADDRESS);
+	Wire.send(0);
+	Wire.endTransmission();
+
+	Wire.requestFrom(DS1307_ADDRESS, 7);
+
+	ds.second	 = bcdToDec(Wire.receive());
+	ds.minute	 = bcdToDec(Wire.receive());
+	ds.hour		 = bcdToDec(Wire.receive() & 0b111111);	// 24 hour time
+	ds.dayOfWeek = bcdToDec(Wire.receive());
+	ds.day 		 = bcdToDec(Wire.receive());
+	ds.month	 = bcdToDec(Wire.receive());
+	ds.year		 = bcdToDec(Wire.receive());
+}
+
+
+/**
+ * Sets the date and time on the DS1307, starts the clock,
+ * sets hour mode to 24 hour clock, assumes that valid numbers are passed.
+ */
+void setTime() {
+   Wire.beginTransmission(DS1307_ADDRESS);
+   Wire.send(0);
+   Wire.send(decToBcd(ds.second));	// 0 to bit 7 starts the clock
+   Wire.send(decToBcd(ds.minute));
+   Wire.send(decToBcd(ds.hour));		
+   Wire.send(decToBcd(ds.dayOfWeek));
+   Wire.send(decToBcd(ds.day));
+   Wire.send(decToBcd(ds.month));
+   Wire.send(decToBcd(ds.year));
+   Wire.endTransmission();
+}
 
 
 void setNixieNum(uint8_t num) {
@@ -75,31 +156,6 @@ void setNixieNum(uint8_t num) {
 	for(i=0; i<4; i++) {
 		digitalWrite(bits[i], nums[num][i]);
 	}
-}
-
-
-void setup(void) {
-	// Disable the other timer
-	TCCR1A	= 0;
-	// Configure timer for 400Hz (refresh each NIXIE with 100Hz)
-	TCCR1B	= (1 << WGM12) | (1<<CS10); 
-	OCR1A	= 0x9C4;
-	TIMSK1	= (1 << OCIE1A);
-	
-	pinMode(NIXIE1, OUTPUT);
-	pinMode(NIXIE2, OUTPUT);
-	pinMode(NIXIE3, OUTPUT);
-	pinMode(NIXIE4, OUTPUT);
-	
-	pinMode(DECIMAL, OUTPUT);
-	
-	pinMode(BIT_A, OUTPUT);
-	pinMode(BIT_B, OUTPUT);
-	pinMode(BIT_C, OUTPUT);
-	pinMode(BIT_D, OUTPUT);
-	
-	pinMode(SWITCH_UP, INPUT);
-	pinMode(SWITCH_DOWN, INPUT);
 }
 
 
@@ -119,63 +175,149 @@ void updateNixies(void) {
 
 static int mod_add(int value, int diff, int max) {
 	if (diff < 0) {
-		return (value + max + diff)%max;
+		return (value + max + diff) % max;
 	}
 	if (diff > 0) {
-		return (value+diff)%max;
+		return (value+diff) % max;
 	}
 }
 
 
 void adjustTime(int8_t v) {
-	p.get_time();
+	getTime();
 	
 	if (v > 0) {
-		if (p.minute == 59) {
-			p.hour = mod_add(p.hour, 1, 24);
+		if (ds.minute == 59) {
+			ds.hour = mod_add(ds.hour, 1, 24);
 		}
-		p.minute = mod_add(p.minute, 1, 60);
+		ds.minute = mod_add(ds.minute, 1, 60);
 	} 
-	else if (v<0) {
-		if (p.minute == 0) {
-			p.hour = mod_add(p.hour, -1, 24);
+	else if (v < 0) {
+		if (ds.minute == 0) {
+			ds.hour = mod_add(ds.hour, -1, 24);
 		}
-		p.minute = mod_add(p.minute, -1, 60);
+		ds.minute = mod_add(ds.minute, -1, 60);
 	} 
-	p.set_time();
+	ds.second = 0;
+	
+	setTime();
 }
 
 
 void refreshNixieVals(void) {
-	nixie_val[0] = (p.hour / 10);
-	nixie_val[1] = p.hour % 10;
-	nixie_val[2] = (p.minute / 10);
-	nixie_val[3] = p.minute % 10;	
+	switch(mode) {
+		case SHOW_TIME:
+			nixie_set[0] = ds.hour / 10;
+			nixie_set[1] = ds.hour % 10;
+			nixie_set[2] = ds.minute / 10;
+			nixie_set[3] = ds.minute % 10;
+			break;
+		case SHOW_DATE:
+			nixie_set[0] = ds.day / 10;
+			nixie_set[1] = ds.day % 10;
+			nixie_set[2] = ds.month / 10;
+			nixie_set[3] = ds.month % 10;
+			break;
+		case SHOW_YEAR:
+			nixie_set[0] = 2;
+			nixie_set[1] = 0;
+			nixie_set[2] = ds.year / 10;
+			nixie_set[3] = ds.year % 10;
+			break;
+	}	
+}
+
+
+static uint8_t get_level(uint8_t v) {
+	uint8_t l = sizeof(nixie_level);
+	while (--l && nixie_level[l] != v) {}
+	return l;
+}
+
+static void animate(void) {
+	uint8_t i = 0;
+	uint8_t cl = 0;
+	uint8_t tl = 0;
+	for (i = 0; i<N_NIXIES; i++) {
+		cl = get_level(nixie_val[i]);
+		tl = get_level(nixie_set[i]);
+		if (cl > tl) {
+			// move down a level
+			nixie_val[i] = nixie_level[cl-1];
+		} else if (cl < tl) {
+			nixie_val[i] = nixie_level[cl+1];
+		}
+	}
+}
+
+
+void setup(void) {
+	// Disable the other timer
+	TCCR1A	= 0;
+	
+	// Configure timer for 400Hz (refresh each NIXIE with 100Hz)
+	TCCR1B	= (1 << WGM12) | (1<<CS10); 
+	OCR1A	= 0x9C4;
+	TIMSK1	= (1 << OCIE1A);
+	
+	pinMode(NIXIE1, OUTPUT);
+	pinMode(NIXIE2, OUTPUT);
+	pinMode(NIXIE3, OUTPUT);
+	pinMode(NIXIE4, OUTPUT);
+	
+	pinMode(DECIMAL, OUTPUT);
+	
+	pinMode(BIT_A, OUTPUT);
+	pinMode(BIT_B, OUTPUT);
+	pinMode(BIT_C, OUTPUT);
+	pinMode(BIT_D, OUTPUT);
+	
+	pinMode(SWITCH_UP, INPUT);
+	pinMode(SWITCH_DOWN, INPUT);
+	
+	pinMode(BUTTON, INPUT);
+	
+	ds.hour = 20;
+	ds.minute = 6;
+	ds.second = 0;
+	ds.day = 5;
+	ds.dayOfWeek = 7;
+	ds.month = 2;
+	ds.year = 12;
+	
+	setTime();
 }
 
 
 void loop(void) {	
 	switchup = digitalRead(SWITCH_UP);
 	switchdn = digitalRead(SWITCH_DOWN);
+	btn = digitalRead(BUTTON);
 	
 	if(switchup) {
 		adjustTime(1);
 		refreshNixieVals();
-		delay(100);
+		delay(150);
 	}
 	
 	if(switchdn) {
 		adjustTime(-1);
 		refreshNixieVals();
-		delay(100);
+		delay(150);
 	}
-			
+		
+	if(btn) {
+		mode++;
+		mode %= 3;
+		refreshNixieVals();
+		delay(200);
+	}	
 	
 	if (time_passed) {	
 		cnt++;
 		
 		if(cnt == 1) {
-			p.get_time();
+			getTime();
 			refreshNixieVals();
 		}
 		
@@ -183,15 +325,38 @@ void loop(void) {
 		time_passed = 0;
 	}
 			
-	// Flash decimal point every even second
-	if(p.second != cur_sec) {		
-		digitalWrite(DECIMAL, (cur_sec % 2));		
-		cur_sec = p.second;
+	if(ds.second != cur_sec) {
+		cur_sec = ds.second;
+	}
+	
+	switch(mode) {
+		case 0:
+			digitalWrite(DECIMAL, (cur_sec % 2));
+			break;
+		case 1:
+			digitalWrite(DECIMAL, HIGH);
+			break;
+		case 2:
+			digitalWrite(DECIMAL, LOW);
+			break;
+	}
+	
+
+	if (animation_step) {
+		animate();
+		animation_step = 0;
 	}
 }
 
 
 ISR(TIMER1_COMPA_vect) {
 	updateNixies();
+
+	static uint8_t count = 0;
+	if (count++ >= animation_speed) {
+		animation_step = 1;
+		count = 0;
+	}
+	
 	time_passed = 1;
 }
