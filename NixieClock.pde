@@ -3,7 +3,7 @@
  * 
  * An Arduino Sketch for multiplexing 4 NIXIE tubes to show the 
  * current time.
- * The time is read from a Philips PCF8583 RTC chip. 
+ * The time is read from a DS1307 RTC chip. 
  * 
  * by Andreas Tacke (at@mail.fiendie.net).
  *
@@ -38,6 +38,7 @@
 
 #define N_NIXIES	4
 
+// Pin assignments
 #define NIXIE1		2
 #define NIXIE2		3
 #define NIXIE3		13
@@ -56,16 +57,16 @@
 #define BUTTON		8
 
 
- // Holds the current time and date
- struct {
- 	int hour;
- 	int minute;
- 	int second;
- 	int dayOfWeek;
- 	int day;
- 	int month;
- 	int year;
- } ds;
+// Holds the current time and date
+struct {
+	uint8_t hour;
+	uint8_t minute;
+ 	uint8_t second;
+ 	uint8_t dayOfWeek;
+ 	uint8_t day;
+ 	uint8_t month;
+ 	uint8_t year;
+} ds;
 
 static const uint8_t nixies[N_NIXIES]	= { NIXIE1, NIXIE2, NIXIE3, NIXIE4 };
 static const uint8_t bits[4]			= { BIT_A, BIT_B, BIT_C, BIT_D };
@@ -88,7 +89,7 @@ static const uint8_t nixie_level[10+1] = {
 	10, 1, 2, 6, 7,	5, 0, 4, 9, 8, 3
 };
 
-static uint8_t animation_speed = 8;
+static const uint8_t animation_speed = 10;
 static volatile uint8_t animation_step = 0;
 
 static uint8_t switchup	= 0;
@@ -98,24 +99,24 @@ static uint8_t btn = 0;
 static uint8_t mode = 0;
 
 static uint8_t cur_sec = 0;
-static int cnt = 0;
+static uint8_t cnt = 0;
 
 static uint8_t active_nixie = 0;
 
 
 // Converts binary-coded decimal back to decimal
-byte bcdToDec(byte val) {
+static uint8_t bcdToDec(uint8_t val) {
 	return ((val / 16 * 10) + (val % 16));
 }
 
 
 // Converts decimal values to binary-coded decimal
-byte decToBcd(byte val) {
+static uint8_t decToBcd(uint8_t val) {
   return ((val / 10 * 16) + (val % 10));
 }
 
 
-void getTime() {
+static void getTime(void) {
 	// Reset the register pointer
 	Wire.beginTransmission(DS1307_ADDRESS);
 	Wire.send(0);
@@ -137,7 +138,7 @@ void getTime() {
  * Sets the date and time on the DS1307, starts the clock,
  * sets hour mode to 24 hour clock, assumes that valid numbers are passed.
  */
-void setTime() {
+static void setTime(void) {
    Wire.beginTransmission(DS1307_ADDRESS);
    Wire.send(0);
    Wire.send(decToBcd(ds.second));	// 0 to bit 7 starts the clock
@@ -151,16 +152,16 @@ void setTime() {
 }
 
 
-void setNixieNum(uint8_t num) {
-	int i;
+static void setNixieNum(uint8_t num) {
+	uint8_t i;
 	for(i=0; i<4; i++) {
 		digitalWrite(bits[i], nums[num][i]);
 	}
 }
 
 
-void updateNixies(void) {
-	int i;
+static void updateNixies(void) {
+	uint8_t i;
 	for(i=0; i<4; i++) {
 		digitalWrite(nixies[i], HIGH);
 	}	
@@ -173,30 +174,30 @@ void updateNixies(void) {
 }
 
 
-static int mod_add(int value, int diff, int max) {
+static uint8_t modAdd(int8_t value, int8_t diff, int8_t v_max) {
 	if (diff < 0) {
-		return (value + max + diff) % max;
+		return (value + v_max + diff) % v_max;
 	}
 	if (diff > 0) {
-		return (value+diff) % max;
+		return (value + diff) % v_max;
 	}
 }
 
 
-void adjustTime(int8_t v) {
+static void adjustTime(int8_t v) {
 	getTime();
 	
 	if (v > 0) {
 		if (ds.minute == 59) {
-			ds.hour = mod_add(ds.hour, 1, 24);
+			ds.hour = modAdd(ds.hour, 1, 24);
 		}
-		ds.minute = mod_add(ds.minute, 1, 60);
+		ds.minute = modAdd(ds.minute, 1, 60);
 	} 
 	else if (v < 0) {
 		if (ds.minute == 0) {
-			ds.hour = mod_add(ds.hour, -1, 24);
+			ds.hour = modAdd(ds.hour, -1, 24);
 		}
-		ds.minute = mod_add(ds.minute, -1, 60);
+		ds.minute = modAdd(ds.minute, -1, 60);
 	} 
 	ds.second = 0;
 	
@@ -204,7 +205,7 @@ void adjustTime(int8_t v) {
 }
 
 
-void refreshNixieVals(void) {
+static void refreshNixieVals(void) {
 	switch(mode) {
 		case SHOW_TIME:
 			nixie_set[0] = ds.hour / 10;
@@ -234,6 +235,7 @@ static uint8_t get_level(uint8_t v) {
 	return l;
 }
 
+
 static void animate(void) {
 	uint8_t i = 0;
 	uint8_t cl = 0;
@@ -242,7 +244,7 @@ static void animate(void) {
 		cl = get_level(nixie_val[i]);
 		tl = get_level(nixie_set[i]);
 		if (cl > tl) {
-			// move down a level
+			// Move down a level
 			nixie_val[i] = nixie_level[cl-1];
 		} else if (cl < tl) {
 			nixie_val[i] = nixie_level[cl+1];
@@ -255,9 +257,9 @@ void setup(void) {
 	// Disable the other timer
 	TCCR1A	= 0;
 	
-	// Configure timer for 400Hz (refresh each NIXIE with 100Hz)
+	// Configure timer for 200Hz (refresh each NIXIE with 100Hz)
 	TCCR1B	= (1 << WGM12) | (1<<CS10); 
-	OCR1A	= 0x9C4;
+	OCR1A	= 0x1388;
 	TIMSK1	= (1 << OCIE1A);
 	
 	pinMode(NIXIE1, OUTPUT);
@@ -277,15 +279,15 @@ void setup(void) {
 	
 	pinMode(BUTTON, INPUT);
 	
-	ds.hour = 20;
-	ds.minute = 6;
-	ds.second = 0;
-	ds.day = 5;
-	ds.dayOfWeek = 7;
-	ds.month = 2;
-	ds.year = 12;
-	
-	setTime();
+	// ds.hour = 11;
+	// ds.minute = 12;
+	// ds.second = 45;
+	// ds.day = 6;
+	// ds.dayOfWeek = 1;
+	// ds.month = 2;
+	// ds.year = 12;
+	// 
+	// setTime();
 }
 
 
@@ -330,13 +332,13 @@ void loop(void) {
 	}
 	
 	switch(mode) {
-		case 0:
+		case SHOW_TIME:
 			digitalWrite(DECIMAL, (cur_sec % 2));
 			break;
-		case 1:
+		case SHOW_DATE:
 			digitalWrite(DECIMAL, HIGH);
 			break;
-		case 2:
+		case SHOW_YEAR:
 			digitalWrite(DECIMAL, LOW);
 			break;
 	}
