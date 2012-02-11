@@ -29,7 +29,8 @@
 
 #include <Wire.h>
 #include <stdio.h>
-	 
+#include <avr/wdt.h>
+	 	 
 #define DS1307_ADDRESS 0x68
 
 #define SHOW_TIME	0
@@ -243,6 +244,7 @@ static void animate(void) {
 	for (i = 0; i<N_NIXIES; i++) {
 		cl = get_level(nixie_val[i]);
 		tl = get_level(nixie_set[i]);
+		
 		if (cl > tl) {
 			// Move down a level
 			nixie_val[i] = nixie_level[cl-1];
@@ -262,6 +264,9 @@ void setup(void) {
 	OCR1A	= 0x1388;
 	TIMSK1	= (1 << OCIE1A);
 	
+	// Enable watchdog timer with a 1 second time-out
+	wdt_enable(WDTO_1S);
+	
 	pinMode(NIXIE1, OUTPUT);
 	pinMode(NIXIE2, OUTPUT);
 	pinMode(NIXIE3, OUTPUT);
@@ -278,20 +283,13 @@ void setup(void) {
 	pinMode(SWITCH_DOWN, INPUT);
 	
 	pinMode(BUTTON, INPUT);
-	
-	// ds.hour = 11;
-	// ds.minute = 12;
-	// ds.second = 45;
-	// ds.day = 6;
-	// ds.dayOfWeek = 1;
-	// ds.month = 2;
-	// ds.year = 12;
-	// 
-	// setTime();
 }
 
 
-void loop(void) {	
+void loop(void) {
+	// Woof woof!
+	wdt_reset();
+	
 	switchup = digitalRead(SWITCH_UP);
 	switchdn = digitalRead(SWITCH_DOWN);
 	btn = digitalRead(BUTTON);
