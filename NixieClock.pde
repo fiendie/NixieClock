@@ -59,7 +59,7 @@
 
 
 // Holds the current time and date
-struct {
+static struct {
 	uint8_t hour;
 	uint8_t minute;
  	uint8_t second;
@@ -259,9 +259,9 @@ void setup(void) {
 	// Disable the other timer
 	TCCR1A	= 0;
 	
-	// Configure timer for 200Hz (refresh each NIXIE with 100Hz)
+	// Configure timer for 500Hz (refresh each NIXIE with 125Hz)
 	TCCR1B	= (1 << WGM12) | (1<<CS10); 
-	OCR1A	= 0x1388;
+	OCR1A	= 0x7D0;
 	TIMSK1	= (1 << OCIE1A);
 	
 	// Enable watchdog timer with a 1 second time-out
