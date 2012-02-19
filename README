@@ -1,7 +1,7 @@
 This Arduino Sketch controls a NIXIE clock with 4 tubes. 
 I used a plain ATMega168 microcontroller instead of an Arduino board for obvious reasons.
-Here is a picture of the circuit board: http://dl.dropbox.com/u/3873342/NIXIE/IMG_3210.jpg
+Here is a picture of the circuit board: https://github.com/fiendie/NixieClock/raw/master/images/circuit.jpg
 
 I am using a DS1307 RTC chip to keep track of the time. 
 
-Schematics will be made available as soon as I find some time.
+The schematics can be found here: https://github.com/fiendie/NixieClock/tree/master/schematics
