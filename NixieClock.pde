@@ -73,15 +73,15 @@ static const uint8_t nixies[N_NIXIES]	= { NIXIE1, NIXIE2, NIXIE3, NIXIE4 };
 static const uint8_t bits[4]			= { BIT_A, BIT_B, BIT_C, BIT_D };
 
 static const uint8_t nums[10][4] = {
-	{0, 0, 0, 0}, {1, 0, 0, 0}, {0, 1, 0, 0}, {1, 1, 0, 0}, {0, 0, 1, 0},
-	{1, 0, 1, 0}, {0, 1, 1, 0},	{1, 1, 1, 0}, {0, 0, 0, 1},	{1, 0, 0, 1}
+	{ 0, 0, 0, 0 }, { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 1, 1, 0, 0 }, { 0, 0, 1, 0 },
+	{ 1, 0, 1, 0 }, { 0, 1, 1, 0 },	{ 1, 1, 1, 0 }, { 0, 0, 0, 1 }, { 1, 0, 0, 1 }
 };
 
 // The values that are currently being displayed
 static volatile uint8_t nixie_val[N_NIXIES] = { 0 };
 
 // The values that are actually to be displayed in the end 
-static uint8_t nixie_set[N_NIXIES] = {0};
+static uint8_t nixie_set[N_NIXIES] = { 0 };
 
 static volatile uint8_t time_passed = 1;
 

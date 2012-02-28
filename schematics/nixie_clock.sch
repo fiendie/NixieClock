@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.0">
+<eagle version="6.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -14751,66 +14751,6 @@ general purpose rectifier, 1 A</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="ds1307">
-<packages>
-<package name="DS1307">
-<pad name="1" x="-6.35" y="3.81" drill="0.8" shape="square"/>
-<pad name="2" x="-6.35" y="1.27" drill="0.8" shape="square"/>
-<pad name="3" x="-6.35" y="-1.27" drill="0.8" shape="square"/>
-<pad name="4" x="-6.35" y="-3.81" drill="0.8" shape="square"/>
-<pad name="8" x="6.35" y="3.81" drill="0.8" shape="square"/>
-<pad name="7" x="6.35" y="1.27" drill="0.8" shape="square"/>
-<pad name="6" x="6.35" y="-1.27" drill="0.8" shape="square"/>
-<pad name="5" x="6.35" y="-3.81" drill="0.8" shape="square"/>
-<wire x1="-5.08" y1="6.35" x2="-5.08" y2="-6.35" width="0.127" layer="21"/>
-<wire x1="-5.08" y1="-6.35" x2="5.08" y2="-6.35" width="0.127" layer="21"/>
-<wire x1="5.08" y1="-6.35" x2="5.08" y2="6.35" width="0.127" layer="21"/>
-<wire x1="5.08" y1="6.35" x2="-5.08" y2="6.35" width="0.127" layer="21"/>
-</package>
-</packages>
-<symbols>
-<symbol name="DS1307">
-<pin name="XTAL1" x="-15.24" y="7.62" length="middle"/>
-<pin name="XTAL2" x="-15.24" y="2.54" length="middle"/>
-<pin name="VBAT" x="-15.24" y="-2.54" length="middle"/>
-<pin name="GND" x="-15.24" y="-7.62" length="middle"/>
-<pin name="VCC" x="15.24" y="7.62" length="middle" rot="R180"/>
-<pin name="SQW" x="15.24" y="2.54" length="middle" rot="R180"/>
-<pin name="SCL" x="15.24" y="-2.54" length="middle" rot="R180"/>
-<pin name="SDA" x="15.24" y="-7.62" length="middle" rot="R180"/>
-<wire x1="-10.16" y1="12.7" x2="-10.16" y2="-12.7" width="0.254" layer="94"/>
-<wire x1="10.16" y1="-12.7" x2="10.16" y2="12.7" width="0.254" layer="94"/>
-<wire x1="-10.16" y1="12.7" x2="10.16" y2="12.7" width="0.254" layer="94"/>
-<wire x1="-10.16" y1="-12.7" x2="10.16" y2="-12.7" width="0.254" layer="94"/>
-<text x="-10.16" y="-17.78" size="2.1844" layer="95">&gt;NAME</text>
-<text x="-10.16" y="15.24" size="2.1844" layer="96">&gt;VALUE</text>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="DS1307">
-<gates>
-<gate name="G$1" symbol="DS1307" x="0" y="0"/>
-</gates>
-<devices>
-<device name="-TH" package="DS1307">
-<connects>
-<connect gate="G$1" pin="GND" pad="4"/>
-<connect gate="G$1" pin="SCL" pad="6"/>
-<connect gate="G$1" pin="SDA" pad="5"/>
-<connect gate="G$1" pin="SQW" pad="7"/>
-<connect gate="G$1" pin="VBAT" pad="3"/>
-<connect gate="G$1" pin="VCC" pad="8"/>
-<connect gate="G$1" pin="XTAL1" pad="1"/>
-<connect gate="G$1" pin="XTAL2" pad="2"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 <library name="max1771">
 <packages>
 <package name="MAX1771">
@@ -14947,6 +14887,66 @@ general purpose rectifier, 1 A</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="ds1307">
+<packages>
+<package name="DS1307">
+<pad name="1" x="-6.35" y="3.81" drill="0.8" shape="square"/>
+<pad name="2" x="-6.35" y="1.27" drill="0.8" shape="square"/>
+<pad name="3" x="-6.35" y="-1.27" drill="0.8" shape="square"/>
+<pad name="4" x="-6.35" y="-3.81" drill="0.8" shape="square"/>
+<pad name="8" x="6.35" y="3.81" drill="0.8" shape="square"/>
+<pad name="7" x="6.35" y="1.27" drill="0.8" shape="square"/>
+<pad name="6" x="6.35" y="-1.27" drill="0.8" shape="square"/>
+<pad name="5" x="6.35" y="-3.81" drill="0.8" shape="square"/>
+<wire x1="-5.08" y1="5.08" x2="-5.08" y2="-5.08" width="0.127" layer="21"/>
+<wire x1="-5.08" y1="-5.08" x2="5.08" y2="-5.08" width="0.127" layer="21"/>
+<wire x1="5.08" y1="-5.08" x2="5.08" y2="5.08" width="0.127" layer="21"/>
+<wire x1="5.08" y1="5.08" x2="-5.08" y2="5.08" width="0.127" layer="21"/>
+</package>
+</packages>
+<symbols>
+<symbol name="DS1307">
+<pin name="XTAL1" x="-15.24" y="7.62" length="middle"/>
+<pin name="XTAL2" x="-15.24" y="2.54" length="middle"/>
+<pin name="VBAT" x="-15.24" y="-2.54" length="middle"/>
+<pin name="GND" x="-15.24" y="-7.62" length="middle"/>
+<pin name="VCC" x="15.24" y="7.62" length="middle" rot="R180"/>
+<pin name="SQW" x="15.24" y="2.54" length="middle" rot="R180"/>
+<pin name="SCL" x="15.24" y="-2.54" length="middle" rot="R180"/>
+<pin name="SDA" x="15.24" y="-7.62" length="middle" rot="R180"/>
+<wire x1="-10.16" y1="12.7" x2="-10.16" y2="-12.7" width="0.254" layer="94"/>
+<wire x1="10.16" y1="-12.7" x2="10.16" y2="12.7" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="12.7" x2="10.16" y2="12.7" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-12.7" x2="10.16" y2="-12.7" width="0.254" layer="94"/>
+<text x="-10.16" y="-17.78" size="2.1844" layer="95">&gt;NAME</text>
+<text x="-10.16" y="15.24" size="2.1844" layer="96">&gt;VALUE</text>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="DS1307">
+<gates>
+<gate name="G$1" symbol="DS1307" x="0" y="0"/>
+</gates>
+<devices>
+<device name="-TH" package="DS1307">
+<connects>
+<connect gate="G$1" pin="GND" pad="4"/>
+<connect gate="G$1" pin="SCL" pad="6"/>
+<connect gate="G$1" pin="SDA" pad="5"/>
+<connect gate="G$1" pin="SQW" pad="7"/>
+<connect gate="G$1" pin="VBAT" pad="3"/>
+<connect gate="G$1" pin="VCC" pad="8"/>
+<connect gate="G$1" pin="XTAL1" pad="1"/>
+<connect gate="G$1" pin="XTAL2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -15005,12 +15005,12 @@ general purpose rectifier, 1 A</description>
 <part name="Q2" library="crystal" deviceset="86SMX" device=""/>
 <part name="G1" library="battery" deviceset="CR2032H" device=""/>
 <part name="T9" library="transistor" deviceset="*-NPN-" device="TO92-CBE" technology="MPSA44"/>
-<part name="IC5" library="ds1307" deviceset="DS1307" device="-TH"/>
 <part name="IC4" library="max1771" deviceset="MAX1771" device="-TH"/>
 <part name="NT1" library="nixie" deviceset="NIXIE" device="-IN-12B"/>
 <part name="NT2" library="nixie" deviceset="NIXIE" device="-IN-12B"/>
 <part name="NT3" library="nixie" deviceset="NIXIE" device="-IN-12B"/>
 <part name="NT4" library="nixie" deviceset="NIXIE" device="-IN-12B"/>
+<part name="U$1" library="ds1307" deviceset="DS1307" device="-TH"/>
 </parts>
 <sheets>
 <sheet>
@@ -15065,12 +15065,12 @@ general purpose rectifier, 1 A</description>
 <instance part="Q2" gate="G$1" x="-83.82" y="-33.02" rot="R90"/>
 <instance part="G1" gate="1" x="-93.98" y="-40.64"/>
 <instance part="T9" gate="G$1" x="7.62" y="-22.86"/>
-<instance part="IC5" gate="G$1" x="-60.96" y="-38.1"/>
 <instance part="IC4" gate="MAX1771" x="33.02" y="2.54"/>
 <instance part="NT1" gate="G$1" x="-119.38" y="25.4"/>
 <instance part="NT2" gate="G$1" x="-81.28" y="25.4"/>
 <instance part="NT3" gate="G$1" x="-43.18" y="25.4"/>
 <instance part="NT4" gate="G$1" x="-5.08" y="25.4"/>
+<instance part="U$1" gate="G$1" x="-60.96" y="-38.1"/>
 </instances>
 <busses>
 </busses>
@@ -15150,7 +15150,7 @@ general purpose rectifier, 1 A</description>
 <pinref part="GND1" gate="1" pin="GND"/>
 <wire x1="-93.98" y1="-53.34" x2="-93.98" y2="-55.88" width="0.1524" layer="91"/>
 <junction x="-93.98" y="-53.34"/>
-<pinref part="IC5" gate="G$1" pin="GND"/>
+<pinref part="U$1" gate="G$1" pin="GND"/>
 </segment>
 </net>
 <net name="N$25" class="0">
@@ -15172,10 +15172,10 @@ general purpose rectifier, 1 A</description>
 <pinref part="IC4" gate="MAX1771" pin="V+"/>
 <wire x1="40.64" y1="-53.34" x2="30.48" y2="-53.34" width="0.1524" layer="91"/>
 <wire x1="30.48" y1="-53.34" x2="30.48" y2="-35.56" width="0.1524" layer="91"/>
-<pinref part="IC5" gate="G$1" pin="VCC"/>
 <wire x1="-45.72" y1="-30.48" x2="-33.02" y2="-30.48" width="0.1524" layer="91"/>
 <wire x1="30.48" y1="-35.56" x2="-33.02" y2="-35.56" width="0.1524" layer="91"/>
 <wire x1="-33.02" y1="-35.56" x2="-33.02" y2="-30.48" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="G$1" pin="VCC"/>
 </segment>
 </net>
 <net name="N$26" class="0">
@@ -15765,7 +15765,7 @@ general purpose rectifier, 1 A</description>
 <wire x1="-25.4" y1="-53.34" x2="-43.18" y2="-53.34" width="0.1524" layer="91"/>
 <wire x1="-43.18" y1="-53.34" x2="-43.18" y2="-45.72" width="0.1524" layer="91"/>
 <wire x1="-43.18" y1="-45.72" x2="-45.72" y2="-45.72" width="0.1524" layer="91"/>
-<pinref part="IC5" gate="G$1" pin="SDA"/>
+<pinref part="U$1" gate="G$1" pin="SDA"/>
 </segment>
 </net>
 <net name="N$42" class="0">
@@ -15774,7 +15774,7 @@ general purpose rectifier, 1 A</description>
 <wire x1="-25.4" y1="-55.88" x2="-40.64" y2="-55.88" width="0.1524" layer="91"/>
 <wire x1="-40.64" y1="-55.88" x2="-40.64" y2="-40.64" width="0.1524" layer="91"/>
 <wire x1="-40.64" y1="-40.64" x2="-45.72" y2="-40.64" width="0.1524" layer="91"/>
-<pinref part="IC5" gate="G$1" pin="SCL"/>
+<pinref part="U$1" gate="G$1" pin="SCL"/>
 </segment>
 </net>
 <net name="IC5" class="0">
@@ -15783,7 +15783,7 @@ general purpose rectifier, 1 A</description>
 <wire x1="-78.74" y1="-35.56" x2="-78.74" y2="-38.1" width="0.1524" layer="91"/>
 <pinref part="Q2" gate="G$1" pin="1"/>
 <wire x1="-78.74" y1="-38.1" x2="-83.82" y2="-38.1" width="0.1524" layer="91"/>
-<pinref part="IC5" gate="G$1" pin="XTAL2"/>
+<pinref part="U$1" gate="G$1" pin="XTAL2"/>
 </segment>
 </net>
 <net name="N$45" class="0">
@@ -15792,14 +15792,14 @@ general purpose rectifier, 1 A</description>
 <wire x1="-78.74" y1="-30.48" x2="-78.74" y2="-27.94" width="0.1524" layer="91"/>
 <pinref part="Q2" gate="G$1" pin="2"/>
 <wire x1="-78.74" y1="-27.94" x2="-83.82" y2="-27.94" width="0.1524" layer="91"/>
-<pinref part="IC5" gate="G$1" pin="XTAL1"/>
+<pinref part="U$1" gate="G$1" pin="XTAL1"/>
 </segment>
 </net>
 <net name="N$47" class="0">
 <segment>
 <pinref part="G1" gate="1" pin="+"/>
 <wire x1="-76.2" y1="-40.64" x2="-88.9" y2="-40.64" width="0.1524" layer="91"/>
-<pinref part="IC5" gate="G$1" pin="VBAT"/>
+<pinref part="U$1" gate="G$1" pin="VBAT"/>
 </segment>
 </net>
 <net name="N$48" class="0">
