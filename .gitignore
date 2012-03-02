@@ -1,6 +1,6 @@
 .tm_properties
 .DS_Store
-applet
+build-cli
 *.s#*
 *.b#*
 *.brd

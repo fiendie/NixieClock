@@ -120,18 +120,18 @@ static uint8_t decToBcd(uint8_t val) {
 static void getTime(void) {
 	// Reset the register pointer
 	Wire.beginTransmission(DS1307_ADDRESS);
-	Wire.send(0);
+	Wire.write((byte)0);
 	Wire.endTransmission();
 
 	Wire.requestFrom(DS1307_ADDRESS, 7);
 
-	ds.second	 = bcdToDec(Wire.receive());
-	ds.minute	 = bcdToDec(Wire.receive());
-	ds.hour		 = bcdToDec(Wire.receive() & 0b111111);	// 24 hour time
-	ds.dayOfWeek = bcdToDec(Wire.receive());
-	ds.day 		 = bcdToDec(Wire.receive());
-	ds.month	 = bcdToDec(Wire.receive());
-	ds.year		 = bcdToDec(Wire.receive());
+	ds.second	 = bcdToDec(Wire.read());
+	ds.minute	 = bcdToDec(Wire.read());
+	ds.hour		 = bcdToDec(Wire.read() & 0b111111);	// 24 hour time
+	ds.dayOfWeek = bcdToDec(Wire.read());
+	ds.day 		 = bcdToDec(Wire.read());
+	ds.month	 = bcdToDec(Wire.read());
+	ds.year		 = bcdToDec(Wire.read());
 }
 
 
@@ -141,14 +141,14 @@ static void getTime(void) {
  */
 static void setTime(void) {
    Wire.beginTransmission(DS1307_ADDRESS);
-   Wire.send(0);
-   Wire.send(decToBcd(ds.second));	// 0 to bit 7 starts the clock
-   Wire.send(decToBcd(ds.minute));
-   Wire.send(decToBcd(ds.hour));		
-   Wire.send(decToBcd(ds.dayOfWeek));
-   Wire.send(decToBcd(ds.day));
-   Wire.send(decToBcd(ds.month));
-   Wire.send(decToBcd(ds.year));
+   Wire.write((byte)0);
+   Wire.write((byte)decToBcd(ds.second));	// 0 to bit 7 starts the clock
+   Wire.write((byte)decToBcd(ds.minute));
+   Wire.write((byte)decToBcd(ds.hour));		
+   Wire.write((byte)decToBcd(ds.dayOfWeek));
+   Wire.write((byte)decToBcd(ds.day));
+   Wire.write((byte)decToBcd(ds.month));
+   Wire.write((byte)decToBcd(ds.year));
    Wire.endTransmission();
 }
 
@@ -262,7 +262,7 @@ void setup(void) {
 	// Configure timer for 500Hz (refresh each NIXIE with 125Hz)
 	TCCR1B	= (1 << WGM12) | (1<<CS10); 
 	OCR1A	= 0x7D0;
-	TIMSK1	= (1 << OCIE1A);
+	TIMSK	= (1 << OCIE1A);
 	
 	// Enable watchdog timer with a 1 second time-out
 	wdt_enable(WDTO_1S);

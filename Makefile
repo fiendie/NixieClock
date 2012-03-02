@@ -1,10 +1,14 @@
-#
-# Makefile for NixieClock
-#
+ARDUINO_DIR				?= /Developer/Arduino/Resources
+ARDUINO_VERSION			?= 100
 
-ARDUINO_PORT					?= /dev/tty.usbmodem621
-ARDUINO_AVRDUDE_PROGRAMMER		?= stk500v2
-ARDUINO_MCU						?= atmega168
-ARDUINO_F_CPU					?= 1000000
+AVRDUDE_ARD_BAUDRATE	?= 115200
+AVRDUDE_ARD_PROGRAMMER	?= stk500v2
 
-include arduino-tpl.mk
+MCU						?= atmega8
+F_CPU					?= 1000000
+ARDUINO_PORT			?= /dev/tty.usbmodem*
+
+TARGET					?= NixieClock
+ARDUINO_LIBS			?= Wire
+
+include Arduino.mk
