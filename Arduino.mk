@@ -36,6 +36,9 @@
 #
 ##########################################################################
 
+ARDUINO_DIR				?= /Developer/Arduino/Resources
+ARDUINO_VERSION			?= 100
+
 ifneq (ARDUINO_DIR,)
 
 ifndef AVR_TOOLS_PATH
@@ -65,10 +68,10 @@ OBJDIR = build-cli
 LOCAL_C_SRCS    = $(wildcard *.c)
 LOCAL_CPP_SRCS  = $(wildcard *.cpp)
 LOCAL_CC_SRCS   = $(wildcard *.cc)
-LOCAL_PDE_SRCS  = $(wildcard *.pde)
+LOCAL_PDE_SRCS  = $(wildcard *.ino)
 LOCAL_AS_SRCS   = $(wildcard *.S)
 LOCAL_OBJ_FILES = $(LOCAL_C_SRCS:.c=.o) $(LOCAL_CPP_SRCS:.cpp=.o) \
-		$(LOCAL_CC_SRCS:.cc=.o) $(LOCAL_PDE_SRCS:.pde=.o) \
+		$(LOCAL_CC_SRCS:.cc=.o) $(LOCAL_PDE_SRCS:.ino=.o) \
 		$(LOCAL_AS_SRCS:.S=.o)
 LOCAL_OBJS      = $(patsubst %,$(OBJDIR)/%,$(LOCAL_OBJ_FILES))
 
@@ -189,8 +192,8 @@ $(OBJDIR)/%.d: %.S
 $(OBJDIR)/%.d: %.s
 	$(CC) -MM $(CPPFLAGS) $(ASFLAGS) $< -MF $@ -MT $(@:.d=.o)
 
-# the pde -> cpp -> o file
-$(OBJDIR)/%.cpp: %.pde
+# the ino -> cpp -> o file
+$(OBJDIR)/%.cpp: %.ino
 	$(ECHO) $(PDEHEADER) > $@
 	$(CAT)  $< >> $@
 

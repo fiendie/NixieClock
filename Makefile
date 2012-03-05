@@ -1,5 +1,6 @@
-ARDUINO_DIR				?= /Developer/Arduino/Resources
-ARDUINO_VERSION			?= 100
+#
+# Makefile for NixieClock
+#
 
 AVRDUDE_ARD_BAUDRATE	?= 115200
 AVRDUDE_ARD_PROGRAMMER	?= stk500v2
