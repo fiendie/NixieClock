@@ -33,29 +33,29 @@
 	 	 
 #define DS1307_ADDRESS 0x68
 
-#define SHOW_TIME	0
-#define SHOW_DATE	1
-#define SHOW_YEAR	2
+#define SHOW_TIME 0
+#define SHOW_DATE 1
+#define SHOW_YEAR 2
 
-#define N_NIXIES	4
+#define N_NIXIES 4
 
 // Pin assignments
-#define NIXIE1		2
-#define NIXIE2		3
-#define NIXIE3		13
-#define NIXIE4		12
+#define NIXIE1 2
+#define NIXIE2 3
+#define NIXIE3 13
+#define NIXIE4 12
 
-#define DECIMAL		9
+#define DECIMAL 9
 
-#define BIT_A		A2
-#define BIT_B		A0
-#define BIT_C		A1
-#define BIT_D		A3
+#define BIT_A A2
+#define BIT_B A0
+#define BIT_C A1
+#define BIT_D A3
 
-#define SWITCH_UP	5
-#define SWITCH_DOWN	6
+#define SWITCH_UP 5
+#define SWITCH_DOWN 6
 
-#define BUTTON		8
+#define BUTTON	 8
 
 
 // Holds the current time and date
@@ -69,8 +69,8 @@ static struct {
  	uint8_t year;
 } ds;
 
-static const uint8_t nixies[N_NIXIES]	= { NIXIE1, NIXIE2, NIXIE3, NIXIE4 };
-static const uint8_t bits[4]			= { BIT_A, BIT_B, BIT_C, BIT_D };
+static const uint8_t nixies[N_NIXIES] = { NIXIE1, NIXIE2, NIXIE3, NIXIE4 };
+static const uint8_t bits[4] = { BIT_A, BIT_B, BIT_C, BIT_D };
 
 static const uint8_t nums[10][4] = {
 	{ 0, 0, 0, 0 }, { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 1, 1, 0, 0 }, { 0, 0, 1, 0 },
@@ -125,13 +125,13 @@ static void getTime(void) {
 
 	Wire.requestFrom(DS1307_ADDRESS, 7);
 
-	ds.second	 = bcdToDec(Wire.read());
-	ds.minute	 = bcdToDec(Wire.read());
-	ds.hour		 = bcdToDec(Wire.read() & 0b111111);	// 24 hour time
-	ds.dayOfWeek = bcdToDec(Wire.read());
-	ds.day 		 = bcdToDec(Wire.read());
-	ds.month	 = bcdToDec(Wire.read());
-	ds.year		 = bcdToDec(Wire.read());
+	ds.second		= bcdToDec(Wire.read());
+	ds.minute		= bcdToDec(Wire.read());
+	ds.hour			= bcdToDec(Wire.read() & 0b111111);	// 24 hour time
+	ds.dayOfWeek	= bcdToDec(Wire.read());
+	ds.day			= bcdToDec(Wire.read());
+	ds.month			= bcdToDec(Wire.read());
+	ds.year			= bcdToDec(Wire.read());
 }
 
 
@@ -283,6 +283,17 @@ void setup(void) {
 	pinMode(SWITCH_DOWN, INPUT);
 	
 	pinMode(BUTTON, INPUT);
+	
+	// Wire.beginTransmission(DS1307_ADDRESS);
+	// Wire.write((byte)0);
+	// Wire.write((byte)decToBcd(0));	// 0 to bit 7 starts the clock
+	// Wire.write((byte)decToBcd(10));
+	// Wire.write((byte)decToBcd(12));		
+	// Wire.write((byte)decToBcd(7));
+	// Wire.write((byte)decToBcd(27));
+	// Wire.write((byte)decToBcd(1));
+	// Wire.write((byte)decToBcd(13));
+	// Wire.endTransmission();
 }
 
 
@@ -295,25 +306,28 @@ void loop(void) {
 	btn = digitalRead(BUTTON);
 	
 	if(switchup) {
+		delay(250);
 		adjustTime(1);
 		refreshNixieVals();
 		delay(150);
 	}
 	
 	if(switchdn) {
+		delay(250);
 		adjustTime(-1);
 		refreshNixieVals();
 		delay(150);
 	}
 		
 	if(btn) {
+		delay(250);
 		mode++;
 		mode %= 3;
 		refreshNixieVals();
-		delay(200);
+		delay(150);
 	}	
 	
-	if (time_passed) {	
+	if (time_passed) {
 		cnt++;
 		
 		if(cnt == 1) {
@@ -321,7 +335,7 @@ void loop(void) {
 			refreshNixieVals();
 		}
 		
-		cnt %= 100;		
+		cnt %= 100;
 		time_passed = 0;
 	}
 			
