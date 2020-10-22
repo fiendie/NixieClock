@@ -1,7 +1,3 @@
-.tm_properties
-.DS_Store
-build-cli
-*.s#*
-*.b#*
-*.brd
-*.pro
+.pio
+.vscode
+
